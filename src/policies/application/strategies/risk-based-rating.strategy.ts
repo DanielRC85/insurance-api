@@ -4,7 +4,6 @@ import { PolicyRatingStrategy } from '../../domain/models/policy-rating-strategy
 import { RiskProfileVO } from '../../domain/models/policy.model';
 import { InvalidPolicyException } from '../../domain/exceptions/invalid-policy.exception';
 
-// RISK_BASED — prima base * (1 + riskScore/100)
 @Injectable()
 export class RiskBasedRatingStrategy extends RatingStrategyPort {
   getName(): PolicyRatingStrategy { return PolicyRatingStrategy.RISK_BASED; }
@@ -19,6 +18,8 @@ export class RiskBasedRatingStrategy extends RatingStrategyPort {
   }
 
   calculatePremium(basePremium: number, riskProfile: RiskProfileVO): number {
-    return basePremium * (1 + riskProfile.riskScore / 100);
+    // Después de validate() riskScore está garantizado
+    const score = riskProfile.riskScore!;
+    return basePremium * (1 + score / 100);
   }
 }
