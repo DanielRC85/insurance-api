@@ -1,0 +1,129 @@
+### ============================================
+### Insurance API — Coleccion de pruebas
+### ============================================
+
+### 1. Crear cliente
+POST http://localhost:3000/api/customers
+Content-Type: application/json
+
+{
+  "name": "Daniel Romero",
+  "email": "daniel@test.com"
+}
+
+### 2. Buscar cliente por id
+GET http://localhost:3000/api/customers/7c3aacc7-bb3b-46b4-a590-b260b0db40c6
+
+### STANDARD — AUTO — Esperado: monthlyPremium = 120000
+POST http://localhost:3000/api/policies
+Content-Type: application/json
+
+{
+  "customerId": "7c3aacc7-bb3b-46b4-a590-b260b0db40c6",
+  "branch": "AUTO",
+  "ratingStrategy": "STANDARD"
+}
+
+### RISK_BASED — LIFE riskScore=50 — Esperado: 135000
+POST http://localhost:3000/api/policies
+Content-Type: application/json
+
+{
+  "customerId": "7c3aacc7-bb3b-46b4-a590-b260b0db40c6",
+  "branch": "LIFE",
+  "ratingStrategy": "RISK_BASED",
+  "riskProfile": { "riskScore": 50 }
+}
+
+### LOYALTY — HOME customerSince=2020 — Esperado: 63750
+POST http://localhost:3000/api/policies
+Content-Type: application/json
+
+{
+  "customerId": "7c3aacc7-bb3b-46b4-a590-b260b0db40c6",
+  "branch": "HOME",
+  "ratingStrategy": "LOYALTY",
+  "riskProfile": { "customerSince": 2020 }
+}
+
+### HEALTH STANDARD — Esperado: copayRate=0.20, waitingPeriodDays=30
+POST http://localhost:3000/api/policies
+Content-Type: application/json
+
+{
+  "customerId": "7c3aacc7-bb3b-46b4-a590-b260b0db40c6",
+  "branch": "HEALTH",
+  "ratingStrategy": "STANDARD"
+}
+
+### QUOTED -> ISSUED
+PATCH http://localhost:3000/api/policies/0f1d1464-d92a-46f7-b208-942fc2fa9dc5/status
+Content-Type: application/json
+
+{ "targetStatus": "ISSUED" }
+
+### ISSUED -> ACTIVE
+PATCH http://localhost:3000/api/policies/0f1d1464-d92a-46f7-b208-942fc2fa9dc5/status
+Content-Type: application/json
+
+{ "targetStatus": "ACTIVE" }
+
+### ACTIVE -> SUSPENDED
+PATCH http://localhost:3000/api/policies/0f1d1464-d92a-46f7-b208-942fc2fa9dc5/status
+Content-Type: application/json
+
+{ "targetStatus": "SUSPENDED" }
+
+### SUSPENDED -> ACTIVE (reactivar)
+PATCH http://localhost:3000/api/policies/0f1d1464-d92a-46f7-b208-942fc2fa9dc5/status
+Content-Type: application/json
+
+{ "targetStatus": "ACTIVE" }
+
+### ACTIVE -> CANCELLED
+PATCH http://localhost:3000/api/policies/0f1d1464-d92a-46f7-b208-942fc2fa9dc5/status
+Content-Type: application/json
+
+{ "targetStatus": "CANCELLED" }
+
+### ERROR — CANCELLED -> ACTIVE (400)
+PATCH http://localhost:3000/api/policies/0f1d1464-d92a-46f7-b208-942fc2fa9dc5/status
+Content-Type: application/json
+
+{ "targetStatus": "ACTIVE" }
+
+### ERROR — LOYALTY sin antiguedad (400)
+POST http://localhost:3000/api/policies
+Content-Type: application/json
+
+{
+  "customerId": "7c3aacc7-bb3b-46b4-a590-b260b0db40c6",
+  "branch": "HOME",
+  "ratingStrategy": "LOYALTY",
+  "riskProfile": { "customerSince": 2025 }
+}
+
+### ERROR — RISK_BASED sin riskScore (400)
+POST http://localhost:3000/api/policies
+Content-Type: application/json
+
+{
+  "customerId": "7c3aacc7-bb3b-46b4-a590-b260b0db40c6",
+  "branch": "AUTO",
+  "ratingStrategy": "RISK_BASED"
+}
+
+### ERROR — email duplicado (409)
+POST http://localhost:3000/api/customers
+Content-Type: application/json
+
+{
+  "name": "Daniel Romero",
+  "email": "daniel@test.com"
+}
+
+### ERROR — poliza no encontrada (404)
+GET http://localhost:3000/api/policies/00000000-0000-0000-0000-000000000000
+
+### Polizas de un cliente
+GET http://localhost:3000/api/policies/customer/7c3aacc7-bb3b-46b4-a590-b260b0db40c6

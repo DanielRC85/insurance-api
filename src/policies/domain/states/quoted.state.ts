@@ -1,9 +1,10 @@
+import { Injectable } from '@nestjs/common';
 import { PolicyStatePort } from '../ports/policy-state.port';
 import { PolicyModel } from '../models/policy.model';
 import { PolicyStatus } from '../models/policy-status.enum';
 import { InvalidStateTransitionException } from '../exceptions/invalid-state-transition.exception';
 
-// QUOTED puede ir a ISSUED o CANCELLED
+@Injectable()
 export class QuotedState extends PolicyStatePort {
   getStatus(): PolicyStatus { return PolicyStatus.QUOTED; }
 
